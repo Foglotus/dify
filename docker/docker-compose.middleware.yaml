@@ -59,6 +59,29 @@ services:
           "redis-cli -a ${REDIS_PASSWORD:-difyai123456} ping | grep -q PONG",
         ]
 
+  # MinIO object storage
+  minio:
+    image: minio/minio:latest
+    restart: always
+    env_file:
+      - ./middleware.env
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin123456}
+      MINIO_BROWSER_REDIRECT_URL: ${MINIO_BROWSER_REDIRECT_URL:-http://localhost:9001}
+    volumes:
+      - ${MINIO_HOST_VOLUME:-./volumes/minio/data}:/data
+      - ./minio/docker-entrypoint.sh:/docker-entrypoint.sh
+    entrypoint: ["/bin/sh", "/docker-entrypoint.sh"]
+    ports:
+      - "${EXPOSE_MINIO_API_PORT:-9000}:9000"
+      - "${EXPOSE_MINIO_CONSOLE_PORT:-9001}:9001"
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
   # The DifySandbox
   sandbox:
     image: langgenius/dify-sandbox:0.2.12
