@@ -19,10 +19,42 @@ class BillingService:
 
     @classmethod
     def get_info(cls, tenant_id: str):
-        params = {"tenant_id": tenant_id}
-
-        billing_info = cls._send_request("GET", "/subscription/info", params=params)
-        return billing_info
+        # Return hardcoded billing info instead of making API request
+        return {
+            "enabled": True,
+            "subscription": {
+                "plan": CloudPlan.TEAM,
+                "interval": "yearly",
+                "education": False,
+            },
+            "members": {
+                "size": 3,
+                "limit": 10000,
+            },
+            "apps": {
+                "size": 5,
+                "limit": 50000,
+            },
+            "vector_space": {
+                "size": 100,
+                "limit": 100000,
+            },
+            "documents_upload_quota": {
+                "size": 20,
+                "limit": 500000,
+            },
+            "annotation_quota_limit": {
+                "size": 5,
+                "limit": 100000,
+            },
+            "docs_processing": "advanced",
+            "can_replace_logo": True,
+            "model_load_balancing_enabled": True,
+            "knowledge_rate_limit": {
+                "limit": 1000000,
+            },
+            "knowledge_pipeline_publish_enabled": True,
+        }
 
     @classmethod
     def get_knowledge_rate_limit(cls, tenant_id: str):

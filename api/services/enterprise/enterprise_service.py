@@ -16,11 +16,51 @@ class WebAppSettings(BaseModel):
 class EnterpriseService:
     @classmethod
     def get_info(cls):
-        return EnterpriseRequest.send_request("GET", "/info")
+        # Return hardcoded enterprise info instead of making API request
+        return {
+            "SSOEnforcedForSignin": False,
+            "SSOEnforcedForSigninProtocol": "",
+            "SSOEnforcedForWebProtocol": "",
+            "EnableEmailCodeLogin": True,
+            "EnableEmailPasswordLogin": True,
+            "IsAllowRegister": True,
+            "IsAllowCreateWorkspace": True,
+            "Branding": {
+                "applicationTitle": "AI平台",
+                "loginPageLogo": "",
+                "workspaceLogo": "",
+                "favicon": "",
+            },
+            "WebAppAuth": {
+                "allowSso": False,
+                "allowEmailCodeLogin": True,
+                "allowEmailPasswordLogin": True,
+            },
+            "License": {
+                "status": "active",
+                "expiredAt": "2025-12-31T23:59:59Z",
+                "workspaces": {
+                    "enabled": True,
+                    "limit": 10,
+                    "used": 2,
+                },
+            },
+            "PluginInstallationPermission": {
+                "pluginInstallationScope": "all",
+                "restrictToMarketplaceOnly": False,
+            },
+        }
 
     @classmethod
     def get_workspace_info(cls, tenant_id: str):
-        return EnterpriseRequest.send_request("GET", f"/workspace/{tenant_id}/info")
+        # Return hardcoded workspace info instead of making API request
+        return {
+            "WorkspaceMembers": {
+                "enabled": True,
+                "used": 5,
+                "limit": 20,
+            }
+        }
 
     @classmethod
     def get_app_sso_settings_last_update_time(cls) -> datetime:
