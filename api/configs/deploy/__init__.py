@@ -32,3 +32,24 @@ class DeploymentConfig(BaseSettings):
         description="Deployment environment (e.g., 'PRODUCTION', 'DEVELOPMENT'), default to PRODUCTION",
         default="PRODUCTION",
     )
+
+    # Default admin account configuration
+    INIT_ADMIN_EMAIL: str | None = Field(
+        description="Default admin email address for automatic initialization",
+        default=None,
+    )
+
+    INIT_ADMIN_PASSWORD: str | None = Field(
+        description="Default admin password for automatic initialization",
+        default=None,
+    )
+
+    INIT_ADMIN_NAME: str | None = Field(
+        description="Default admin name for automatic initialization",
+        default=None,
+    )
+
+    INIT_ADMIN_LANGUAGE: str = Field(
+        description="Default admin language for automatic initialization",
+        default="en-US",
+    )
