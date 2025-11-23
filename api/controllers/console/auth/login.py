@@ -25,6 +25,7 @@ from controllers.console.wraps import email_password_login_enabled, setup_requir
 from events.tenant_event import tenant_was_created
 from libs.helper import email, extract_remote_ip
 from libs.login import current_account_with_tenant
+from libs.rsa_password_encryption import RSAPasswordEncryption
 from libs.token import (
     clear_access_token_from_cookie,
     clear_csrf_token_from_cookie,
@@ -69,15 +70,26 @@ class LoginApi(Resource):
         if invitation:
             invitation = RegisterService.get_invitation_if_token_valid(None, args["email"], invitation)
 
+        # Decrypt password if it's encrypted
+        password = args["password"]
+        try:
+            # Try to decrypt the password
+            # If decryption fails, assume it's plaintext (for backward compatibility)
+            password = RSAPasswordEncryption.decrypt_password(password)
+        except Exception:
+            # If decryption fails, use the password as-is
+            # This ensures backward compatibility with unencrypted passwords
+            pass
+
         try:
             if invitation:
                 data = invitation.get("data", {})
                 invitee_email = data.get("email") if data else None
                 if invitee_email != args["email"]:
                     raise InvalidEmailError()
-                account = AccountService.authenticate(args["email"], args["password"], args["invite_token"])
+                account = AccountService.authenticate(args["email"], password, args["invite_token"])
             else:
-                account = AccountService.authenticate(args["email"], args["password"])
+                account = AccountService.authenticate(args["email"], password)
         except services.errors.account.AccountLoginError:
             raise AccountBannedError()
         except services.errors.account.AccountPasswordError:

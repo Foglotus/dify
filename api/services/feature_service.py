@@ -169,6 +169,7 @@ class SystemFeatureModel(BaseModel):
     plugin_installation_permission: PluginInstallationPermissionModel = PluginInstallationPermissionModel()
     enable_change_email: bool = True
     plugin_manager: PluginManagerModel = PluginManagerModel()
+    password_encrypt_public_key: str = ""
 
 
 class FeatureService:
@@ -213,6 +214,16 @@ class FeatureService:
 
         if dify_config.MARKETPLACE_ENABLED:
             system_features.enable_marketplace = True
+
+        # Set RSA public key for password encryption
+        from libs.rsa_password_encryption import RSAPasswordEncryption
+
+        try:
+            system_features.password_encrypt_public_key = RSAPasswordEncryption.get_public_key()
+        except Exception:
+            # If key generation fails, leave empty string
+            # Frontend will fall back to unencrypted password
+            system_features.password_encrypt_public_key = ""
 
         return system_features
 
